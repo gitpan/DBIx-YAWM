@@ -18,7 +18,7 @@
   
 ## Class Global Values ############################ 
   our @ISA = qw(Exporter);
-  our $VERSION = '2.0.8';
+  our $VERSION = '2.0.9';
   our $errstr = ();
   our @EXPORT_OK = ($VERSION, $errstr);
 
