@@ -1,0 +1,36 @@
+Revision history for Perl extension DBTools.
+
+2.0		4/19/02 14:49:02
+		Initial revision to use autosplit
+
+2.0.1	5/6/02 19:02:04
+		fixed many bugs in DBInsert.
+		now supports Ints option which allows you to define certain
+		fields as neing integers. 
+		To Do: define arbirary data types to field names
+		To Do: quote charachter set to " ... make it so you can modify that for
+				databases which like other quote characters.	
+
+2.0.2	5/7/02 12:46:04
+		fixed problems with escaping quote character in DBInsert
+		
+2.0.3	5/31/02 16:24:04
+		fixed typo in ParseDiary
+
+2.0.4	6/7/02	15:21:04
+		fixed annother typo in ParseDiary ... $errstr to $self->{errstr}
+2.0.5	7/2/02	11:14:30
+		added $sth->finish() 's to BQuery and DBInsert at the behest of the server ops
+		DBAs. Also did away with the SecsupConfig hooks ... no real need for 'em.
+		Added documentation in DBTools.pod
+2.0.6	8/6/02	18:01:06
+		Port can now be specified at object creation for oracle databases. Allowing you 
+		to live apart from the tnsnames.ora file.
+2.0.7	9/18/02	11:00:16
+		Date conversion in ParseDiary is now optional via the DateConvert option.
+
+Namespace changed to DBIx::YAWM for release to CPAN
+
+1.0		10/24/02 16:19:00
+		initial release to CPAN under DBIx::YAWM namespace
+		YAWM stands for Yet Annother Wrapper Module
