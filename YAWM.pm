@@ -18,7 +18,7 @@
   
 ## Class Global Values ############################ 
   our @ISA = qw(Exporter);
-  our $VERSION = '2.2.4';
+  our $VERSION = '2.2.5';
   our $errstr = ();
   our @EXPORT_OK = ($VERSION, $errstr);
 
@@ -221,18 +221,22 @@ sub Insert {
              delete($p{Insert}->{$_});
              next;
          }
-        #quote 'em
-         $p{Insert}->{$_} = $self->{dbh}->quote($p{Insert}->{$_});
      }
+     
+     #Ints has been replaced by 'NoQuote', but we maintain
+     #backward compatibility
+     foreach (keys %{$p{'Ints'}}){ $p{'NoQuote'}->{$_} = 1; }
+    
     #formulate the sql
      my $field_names = join (', ', sort (keys %{$p{Insert}}));
      foreach (sort (keys %{$p{Insert}})){
-         if (exists ($p{Ints}->{$_})){
-             push (@vals, "$p{Insert}->{$_}");
-         }else{
-             push (@vals, "\"$p{Insert}->{$_}\"");
-         }
+     	if (exists($p{'NoQuote'}->{$_})){
+     		push (@vals, $p{Insert}->{$_});
+     	}else{
+     		push (@vals, $self->{dbh}->quote($p{Insert}->{$_}));
+     	}
      }
+     
      my $field_values = join (', ',@vals);
      my $sql = "INSERT INTO $p{Into} ($field_names) VALUES ($field_values)";
     #prepare the statement

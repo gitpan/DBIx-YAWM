@@ -146,6 +146,25 @@ You may find that it is helpfull to build the hash reference inline with the fun
 
  Insert => { 'field1' => $value1, 'field2' => $value2 }
 
+=item NoQuote
+
+This is an ugly hack. Some databases have funny rules about quoting certain values (such as integers).
+By default, YAWM quotes all values with the quote charachter defined by the DBD driver for the 
+database. You can specify a hash reference here, each key in the hash is a field name, the value for
+the key is ignored. If a field is defined in the hash reference, it's value won't be quoted in the
+SQL, here's an example:
+
+$obj->Insert(
+	Into	=> "Stuff",
+	Insert	=> { 'integer'	=> 23, 'string' => "the integer won't be quoted" },
+	NoQuote => { 'integer'	=> 1 }
+);
+
+like I said it's an ugly hack. What would be better of course, would be to pull a table description
+first, and then to match the datatype, and quoting rules. I'd bet that the DBD drivers may do
+something like this already ... but this a "Yet Annother *" module and in keeping in with that spirit
+... ;-)
+
 =back
 
 
