@@ -18,7 +18,7 @@
   
 ## Class Global Values ############################ 
   our @ISA = qw(Exporter);
-  our $VERSION = '2.0.9';
+  our $VERSION = '2.2';
   our $errstr = ();
   our @EXPORT_OK = ($VERSION, $errstr);
 
@@ -45,6 +45,9 @@
      }
     #add in anything which might have been sent in
      foreach (keys %p){ $obj->{$_} = $p{$_}; }
+    #default values
+     $obj->{'LongReadLen'} = 15000 unless (exists($obj->{'LongReadLen'}));
+     $obj->{'LongTruncOk'} = 0 unless (exists($obj->{'LongTruncOk'}));
     #login to database
      unless ($obj->Login()){
          $errstr = $obj->{errstr};
@@ -66,6 +69,10 @@
     #require appropriate dbi module
      my $mod = "DBD\::$self->{DBType}";
      eval "require $mod";
+     if ($@){
+         $self->{'errstr'} = "Login: failed to load DBD module $mod: $@";
+         return (undef);
+     }
     #wow, a "connection string" ... 
      if ($self->{DBType} eq "Sybase"){
          $connect_str = "dbi:Sybase:server=$self->{Server}";
@@ -93,8 +100,8 @@
          return (undef);
      }
     #go ahead and set LongReadLen and LongTruncOk
-     $self->{dbh}->{LongReadLen} = 15000;
-     $self->{dbh}->{LongTruncOk} = 0;
+     $self->{dbh}->{'LongReadLen'} = $self->{'LongReadLen'};
+     $self->{dbh}->{'LongTruncOk'} = $self->{'LongTruncOk'};
     #it's all good baby bay bay ...
      return (1);
  }

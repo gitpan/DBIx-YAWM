@@ -37,3 +37,5 @@ Namespace changed to DBIx::YAWM for release to CPAN
 2.0.9	10/25/02 09:47:05
 		fixed 'use' statement in test.pl so that it will at least
 		pass CPAN testers. Still needs real test suite though.
+2.2		12/06/02 11:32:10
+		now throws error if require failes on DBD module in Login
