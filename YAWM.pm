@@ -18,7 +18,7 @@
   
 ## Class Global Values ############################ 
   our @ISA = qw(Exporter);
-  our $VERSION = '2.2';
+  our $VERSION = '2.2.1';
   our $errstr = ();
   our @EXPORT_OK = ($VERSION, $errstr);
 
@@ -248,4 +248,36 @@ sub Insert {
      $sth->finish();
     #well it must be all-good
      return (1);
+}
+
+
+## Do #############################################
+## prepare and execute an SQL statement of no
+## particular type. If errors are encountered undef is
+## returned and errors go on $obj->{errstr} as usual
+## if successfull, whatever is returned from dbi->execute
+## is returned here
+sub Do {
+    #local vars
+     my ($self, %p) = @_;
+    #required options
+     unless (exists($p{SQL})){
+         $self->{'errstr'} = "[Do]: SQL is a required option to Do";
+         return (undef);
+     }
+    #prepare statement
+     warn ("[Do]: (prepare): $p{SQL}") if $self->{'Debug'};
+     $sth = $self->{dbh}->prepare($p{SQL}) || do {
+         $self->{'errstr'} = "[Do]: failed to prepare SQL ($p{SQL}): $DBI::errstr";
+         warn ($self->{'errstr'}) if $self->{'Debug'};
+         return (undef);
+     };
+     warn ("[Do]: (executing)") if $self->{'Debug'};
+     my $res = $sth->execute() || do {
+         $self->{'errstr'} = "[Do]: failed to execute SQL ($p{SQL}): $DBI::errstr";
+         warn ($self->{'errstr'}) if $self->{'Debug'};
+         return (undef);
+     };
+     $sth->finish();
+     return ($res);
 }

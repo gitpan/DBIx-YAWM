@@ -39,3 +39,6 @@ Namespace changed to DBIx::YAWM for release to CPAN
 		pass CPAN testers. Still needs real test suite though.
 2.2		12/06/02 11:32:10
 		now throws error if require failes on DBD module in Login
+2.2.1	2/24/03 13:55:50
+		added 'Do' method to handle raw sql statements.
+		perhaps good for pl/sql stuffs.

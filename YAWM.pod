@@ -118,6 +118,9 @@ The 'where clause' of your SQL query.
 
 =back
 
+
+
+
 =head1	Insert
 
 =head2 Notes
@@ -151,6 +154,24 @@ You may find that it is helpfull to build the hash reference inline with the fun
 This logs into the database. This method is called internally by the DBTools::New method. 
 This is not intended for public use.
 
+
+
+=head1	Do
+
+=head2	Synopsis
+
+Prepare and execute an arbitrary SQL statement. Return undef if error, else return whatever
+comes back from dbi->execute.
+
+=head2	Options
+
+=over
+
+=item	SQL
+
+the SQL statement to be prepared and executed
+
+=back
 
 =head1	Author: 
 
