@@ -43,6 +43,7 @@ Namespace changed to DBIx::YAWM for release to CPAN
 		added 'Do' method to handle raw sql statements.
 		perhaps good for pl/sql stuffs.
 2.2.2	2/27/03 13:32:00
-		added mysql support. Probably shoudl find a better way of handling 
+		added mysql support. Probably should find a better way of handling 
 		new DBTypes in future versions.
-		
+2.2.3	3/9/03 21:59:30
+		removed 'Pass' as required opton to new. Some databases support users w/no pass

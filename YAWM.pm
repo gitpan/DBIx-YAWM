@@ -18,7 +18,7 @@
   
 ## Class Global Values ############################ 
   our @ISA = qw(Exporter);
-  our $VERSION = '2.2.2';
+  our $VERSION = '2.2.3';
   our $errstr = ();
   our @EXPORT_OK = ($VERSION, $errstr);
 
@@ -32,10 +32,9 @@
      unless (
          (exists ($p{Server})) &&
          (exists ($p{User}))   &&
-         (exists ($p{Pass}))   &&
          (exists ($p{DBType})) 
      ){
-         $errstr = "Server, User, Pass, and DBType are required options to New";
+         $errstr = "Server, User, and DBType are required options to New";
          return (undef);
      }
     #if it's Oracle, we'll be needing a SID too
@@ -63,7 +62,7 @@
     #local vars
      my $self = shift();
      my %p = @_;
-     my ($connect_str) = ();
+     my ($connect_str, @connect_args) = ();
     #are we already logged in?
      if (exists ($self->{dbh})){ return (1); }
     #require appropriate dbi module
@@ -95,12 +94,11 @@
          $self->{errstr}.= "someone needs to edit YAWM.pm";
          return (undef);
      }
+     push (@connect_args, $connect_str);
+     push (@connect_args, $self->{User});
+     push (@connect_args, $self->{Pass}) if (exists($self->{Pass}));
     #make the connection
-     unless ($self->{dbh} = DBI->connect(
-         $connect_str,
-         $self->{User},
-         $self->{Pass}
-     )){
+     unless ($self->{dbh} = DBI->connect(@connect_args)){
          $self->{errstr} = "Login failed: $DBI::errstr";
          return (undef);
      }
