@@ -3,6 +3,7 @@
 ## Andrew N. Hicox <andrew@hicox.com>
 ## http://www.hicox.com
 ##
+## Yet Annother Wrapper Module
 ## Handy tools for talking to databases
 ###################################################
 
@@ -17,7 +18,7 @@
   
 ## Class Global Values ############################ 
   our @ISA = qw(Exporter);
-  our $VERSION = '2.0.7';
+  our $VERSION = '2.0.8';
   our $errstr = ();
   our @EXPORT_OK = ($VERSION, $errstr);
 

@@ -31,6 +31,6 @@ Revision history for Perl extension DBTools.
 
 Namespace changed to DBIx::YAWM for release to CPAN
 
-1.0		10/24/02 16:19:00
+2.0.8	10/24/02 16:19:00
 		initial release to CPAN under DBIx::YAWM namespace
 		YAWM stands for Yet Annother Wrapper Module
