@@ -18,7 +18,7 @@
   
 ## Class Global Values ############################ 
   our @ISA = qw(Exporter);
-  our $VERSION = '2.2.1';
+  our $VERSION = '2.2.2';
   our $errstr = ();
   our @EXPORT_OK = ($VERSION, $errstr);
 
@@ -83,6 +83,11 @@
          }else{
              $connect_str = "dbi:Oracle:host=$self->{Server};sid=$self->{SID}";
          }
+     }elsif ($self->{DBType} eq "mysql"){
+         $connect_str = "dbi:mysql";
+         if ($self->{'Database'}){ $connect_str .= ":database=$self->{'Database'}"; }
+         $connect_str .= ";host=$self->{Server};";
+         if ($self->{'Port'}){ $connect_str .= "port=$self->{'Port'};"; }
      }else{
         #wow this is really ghetto
          $self->{errstr} = "Sorry Dude, ";

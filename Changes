@@ -42,3 +42,7 @@ Namespace changed to DBIx::YAWM for release to CPAN
 2.2.1	2/24/03 13:55:50
 		added 'Do' method to handle raw sql statements.
 		perhaps good for pl/sql stuffs.
+2.2.2	2/27/03 13:32:00
+		added mysql support. Probably shoudl find a better way of handling 
+		new DBTypes in future versions.
+		

@@ -4,7 +4,7 @@ DBIx::YAWM - (Yet Annother Wrapper Module) Provides a simplified interface to DB
 
 This module provides annother layer of abstraction for talking to databases via DBI.
 YAWM.pm can theoretically talk to any database which has a DBD:: driver, however it's
-only been tested against Sybase and Oracle. This module provides support for querying and
+only been tested against MySQL, Sybase and Oracle. This module provides support for querying and
 inserting records (but not updating yet). 
 	
 I guess the value of this module is that it provides a central place where all the SELECT's and
