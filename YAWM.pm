@@ -18,7 +18,7 @@
   
 ## Class Global Values ############################ 
   our @ISA = qw(Exporter);
-  our $VERSION = '2.2.3';
+  our $VERSION = '2.2.4';
   our $errstr = ();
   our @EXPORT_OK = ($VERSION, $errstr);
 
@@ -221,8 +221,8 @@ sub Insert {
              delete($p{Insert}->{$_});
              next;
          }
-        #escape " 's
-         $p{Insert}->{$_} =~s/\"/\"\"/g;
+        #quote 'em
+         $p{Insert}->{$_} = $self->{dbh}->quote($p{Insert}->{$_});
      }
     #formulate the sql
      my $field_names = join (', ', sort (keys %{$p{Insert}}));
@@ -270,7 +270,7 @@ sub Do {
      }
     #prepare statement
      warn ("[Do]: (prepare): $p{SQL}") if $self->{'Debug'};
-     $sth = $self->{dbh}->prepare($p{SQL}) || do {
+     my $sth = $self->{dbh}->prepare($p{SQL}) || do {
          $self->{'errstr'} = "[Do]: failed to prepare SQL ($p{SQL}): $DBI::errstr";
          warn ($self->{'errstr'}) if $self->{'Debug'};
          return (undef);
@@ -283,4 +283,53 @@ sub Do {
      };
      $sth->finish();
      return ($res);
+}
+
+
+## Update #########################################
+## update a record (or records) in the database with 
+## new field settings
+sub Update {
+	my ($self, %p) = @_;
+   #required options
+   	exists($p{'Table'}) || do {
+   		$self->{'errstr'} = "[Update]: 'Table' specifies the table of view to update the record(s) in, please specify";
+		warn ($self->{'errstr'}) if $self->{'Debug'};
+		return (undef);
+   	};
+   	exists($p{'Where'}) || do {
+   		$self->{'errstr'} = "[Update]: 'Where' specified which record(s) in 'Table' to update. please specify";
+   		warn ($self->{'errstr'}) if $self->{'Debug'};
+		return (undef);
+   	};
+   	exists($p{'Fields'}) || do {
+   		$self->{'errstr'} = "[Update]: 'Fields' is a hash reference indicating the field values to update, please specify";
+   		warn ($self->{'errstr'}) if $self->{'Debug'};
+		return (undef);
+   	};
+   #construct SQL String
+    my $sql = "update $p{'Table'} set ";
+    my @fields = ();
+	foreach (keys %{$p{'Fields'}}){
+		my $str = "$_ = ";
+		$str   .= $self->{dbh}->quote($p{'Fields'}->{$_});
+		push (@fields, $str); 
+	}
+	$sql .= join(", ", @fields);
+	$sql .= " ";
+	$sql .= "where $p{'Where'}";
+    warn("[Update]: (prepare): $sql\n") if $self->{'Debug'};
+   #prepare sql
+    my $sth = $self->{dbh}->prepare($sql) || do {
+    	$self->{'errstr'} = "[Update]: failed to prepare sql statement $DBI::errstr [SQL]: $sql";
+    	warn ($self->{'errstr'}) if $self->{'Debug'};
+        return (undef);
+    };
+   #execute sql
+    $sth->execute() || do {
+    	$self->{'errstr'} = "[Update]: failed to execute sql: $DBI::errstr";
+    	warn ($self->{'errstr'}) if $self->{'Debug'};
+        return (undef);
+    };
+    return (1);
 }

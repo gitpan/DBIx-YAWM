@@ -173,6 +173,34 @@ the SQL statement to be prepared and executed
 
 =back
 
+
+=head1	Update
+
+head2	Synopsis
+
+changes data in a preexisting record
+ 
+$Object->Update([options]) || die $Object->{errstr}, "\n";
+
+=head2	Options
+
+=over
+
+=item	Table
+
+name of table which contains record(s) matching 'Where' to update with 'Fields'
+
+=item	Where
+
+where clause that identifies which record(s) to update in 'Table'
+
+=item	Fields
+
+a hash reference containing data to be changed in the matching record(s). Each key is a field name
+each value is the data for the corresponding key.
+
+=back
+
 =head1	Author: 
 
     Andrew N. Hicox	<ahicox@hicox.com>

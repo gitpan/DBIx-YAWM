@@ -47,3 +47,7 @@ Namespace changed to DBIx::YAWM for release to CPAN
 		new DBTypes in future versions.
 2.2.3	3/9/03 21:59:30
 		removed 'Pass' as required opton to new. Some databases support users w/no pass
+2.2.4	3/24/03 17:59:54
+		added Update function
+		now uses dbi's 'quote' function so that we don't have to guess about the correct 
+		type of quotation char.
