@@ -55,3 +55,16 @@ Namespace changed to DBIx::YAWM for release to CPAN
 2.2.5	7/25/03	14:26:55
 		fixed bug in Insert which was causing double quoting.
 		added 'NoQuote' option to replace undocumented 'Ints' option in Insert function
+
+2.3		Thu Sep 29 15:00:24 EDT 2005
+		added 'options' argument to Update, Insert and Query.
+		this allows one to set (mysql) options on these statements 
+		such as 'LOW_PRIORITY'
+
+2.31	Mon Apr 24 17:08:26 GMT 2006
+		added flatQuery which brings us into the late 90's with fetchrow_hashref()
+		yay for select aliases.
+		
+2.32	Tue May  2 14:32:09 EDT 2006
+		added 'lc' option to flatQuery, it translated DBI::getchrow_hashref()'s default
+		all caps output to lowercase

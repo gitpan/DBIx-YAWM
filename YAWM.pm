@@ -18,7 +18,7 @@
   
 ## Class Global Values ############################ 
   our @ISA = qw(Exporter);
-  our $VERSION = '2.2.5';
+  our $VERSION = 2.32;
   our $errstr = ();
   our @EXPORT_OK = ($VERSION, $errstr);
 
@@ -151,9 +151,9 @@ sub Query {
     #make a query string
      my $select_str = join (", ", @{$params{'Select'}});
      if (exists($params{'Where'})){
-         $QUERY = "select $select_str from $params{'From'} where $params{'Where'}";
+         $QUERY = "select " . $params{'Options'} . " $select_str from $params{'From'} where $params{'Where'}";
      }else{
-         $QUERY = "select $select_str from $params{'From'}";
+         $QUERY = "select " . $params{'Options'} . " $select_str from $params{'From'}";
      }
     #prepare the query
      if ($self->{'Debug'} > 1){ print "[Query]: preparing query ...\n"; }
@@ -238,7 +238,7 @@ sub Insert {
      }
      
      my $field_values = join (', ',@vals);
-     my $sql = "INSERT INTO $p{Into} ($field_names) VALUES ($field_values)";
+     my $sql = "INSERT " . $p{'Options'} . " INTO $p{Into} ($field_names) VALUES ($field_values)";
     #prepare the statement
      if ($self->{'Debug'} > 1){ print "[Insert]: preparing query ...\n"; }
      if ($self->{'Debug'} > 1){ print "[Insert]:\t $sql"; }
@@ -312,7 +312,7 @@ sub Update {
 		return (undef);
    	};
    #construct SQL String
-    my $sql = "update $p{'Table'} set ";
+    my $sql = "update " . $p{'Options'} . " " . $p{'Table'} . " set ";
     my @fields = ();
 	foreach (keys %{$p{'Fields'}}){
 		my $str = "$_ = ";
@@ -336,4 +336,100 @@ sub Update {
         return (undef);
     };
     return (1);
+}
+
+
+
+
+## flatQuery ######################################
+## use DBI's built in fetchrow_hashref(), which
+## (I'm guessing) is implemented in xs and far 
+## superior to what we've been doing here for all
+## these years. As such, we don't (necessarily)
+## have to take an array ref on Select ... 
+## hence the name 'flatQuery' ... we can take either
+## a string or an array ... otherwise pretty much
+## the same old.
+
+sub flatQuery {
+
+	my ($self, %p) = @_;
+	
+	#verify required inputs
+	foreach ('Select', 'From'){
+		exists($p{$_}) || do {
+			$self->{'errstr'} = $_ . " is a required option to Query";
+			return (undef);
+		};
+	}
+	
+	#select has to be an array reference or a string
+	if ($#{$p{'Select'}} >= 0){
+		
+		#flatten select
+		$p{'Select'} = join (', ', @{$p{'Select'}});
+	
+	}
+	
+	#error out if it's a null string
+	(length($p{'Select'}) > 0) || do {
+		$self->{'errstr'} = "'Select' option contains no fields to select!";
+		return (undef);
+	};
+	
+	#log into the database
+	$self->Login() || do {
+		$self->{'errstr'} = "Login failed: " . $self->{'errstr'};
+		return (undef);
+	};
+	
+	#struct query string
+	my $QUERY = "select " . $p{'Options'} . " " . $p{'Select'} . " from " . $p{'From'};
+	$QUERY   .= " where " . $p{'Where'} if ($p{'Where'} !~/^\s*$/);
+	
+	#prepare the query
+	warn ("[Query]: preparing query ...") if ($self->{'Debug'} > 1);
+	warn ("[Query]:\t $QUERY\n") if ($self->{'Debug'} > 1);
+	my $sth = $self->{'dbh'}->prepare($QUERY) || do {
+		$self->{errstr} = "Query: failed prepare: $QUERY / $DBI::errstr";
+		return (undef);
+	};
+	
+	#execute query
+	warn ("executing query ...") if $self->{'Debug'};
+	$sth->execute() || do {
+	
+		$self->{'errstr'} = "can't execute query: " . $QUERY . " / " . $DBI::errstr;
+		return (undef);
+	
+	};
+	
+	#well now dbi does hashref internal, and you know its got to be better than what we've been
+	#up to ... so we're going to use this. with any luck, this'll handle the 'as' clause as well
+	my (@out, $rec) = ();
+	while ($rec = $sth->fetchrow_hashref()){ 
+	
+		#translate field names to lowercase if option supplied
+		if ($p{'lc'} !~/^\s*$/){
+			foreach my $k (keys %{$rec}){
+				my $kl = lc($k);
+				$rec->{$kl} = $rec->{$k};
+				delete($rec->{$k}) if ($k ne $kl);
+			}
+		}
+	
+		push (@out, $rec); 
+		
+	}
+	$sth->finish();
+	warn ("retrieved: " . ($#out + 1) . " records") if $self->{'Debug'};
+	
+	#if no records returned
+	($#out >= 0) || do {
+		$self->{'errstr'} = "no records returned";
+		return (undef);
+	};
+	
+	#return what we got
+	return (\@out);
 }
