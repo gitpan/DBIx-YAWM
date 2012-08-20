@@ -68,3 +68,6 @@ Namespace changed to DBIx::YAWM for release to CPAN
 2.32	Tue May  2 14:32:09 EDT 2006
 		added 'lc' option to flatQuery, it translated DBI::getchrow_hashref()'s default
 		all caps output to lowercase
+		
+2.34    Tue Aug  7 18:31:30 GMT 2012
+                added ORA-03114 "not connected to oracle" detection on flatQuery (will auto-reconnect)

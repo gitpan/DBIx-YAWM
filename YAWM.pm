@@ -18,7 +18,7 @@
   
 ## Class Global Values ############################ 
   our @ISA = qw(Exporter);
-  our $VERSION = 2.32;
+  our $VERSION = 2.34;
   our $errstr = ();
   our @EXPORT_OK = ($VERSION, $errstr);
 
@@ -394,13 +394,42 @@ sub flatQuery {
 		$self->{errstr} = "Query: failed prepare: $QUERY / $DBI::errstr";
 		return (undef);
 	};
-	
-	#execute query
-	warn ("executing query ...") if $self->{'Debug'};
+		
+	#do it
 	$sth->execute() || do {
 	
-		$self->{'errstr'} = "can't execute query: " . $QUERY . " / " . $DBI::errstr;
-		return (undef);
+	        #ok, right here ... new for 2.34
+	        #we're going to detect ORA-ORA-03114 "not connected to oracle"
+	        #we'll try to re-connect and re-execute.
+	        if ( ($self->{'DBType'} eq "Oracle") && ($self->{'errstr'} =~/ORA-(\d{1,5})/i) ){
+	                my $ora_code = $1;
+	                
+	                #if we wanted to detect other ora failure codes, here's the spot for it.
+	                
+	                #ORA-03114: try destroying the db handle and reconnecting
+	                if ($ora_code eq "03114"){
+	                        warn ("detected ORA-03114, attempting reconnect") if ($self->{'Debug'});
+	                        $self->{dbh}->disconnect;
+	                        delete($self->{dnh});
+	                        $self->Login() || do {
+	                                $self->{'errstr'}  = "[ORA-03114 encountered, reconnect failed] ";
+	                                $self->{'errstr'} .= "can't execute query: " . $QUERY . " / " . $DBI::errstr;
+	                                return(undef)
+	                        };
+	                        warn ("detected ORA-03114, reconnect succeeded, retrying query") if ($self->{'Debug'});
+                                $sth->execute() || do {
+                                        $self->{'errstr'}  = "[ORA-03114 encountered, reconnect success, but query still fails] ";
+                                        $self->{'errstr'} = "can't execute query: " . $QUERY . " / " . $DBI::errstr;
+                                        return (undef);
+                                };
+	                        
+	                        
+	                }
+	        }else{
+                        #just your run of the mill failure
+                        $self->{'errstr'} = "can't execute query: " . $QUERY . " / " . $DBI::errstr;
+                        return (undef);
+                }
 	
 	};
 	
