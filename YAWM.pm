@@ -18,7 +18,7 @@
   
 ## Class Global Values ############################ 
   our @ISA = qw(Exporter);
-  our $VERSION = 2.34;
+  our $VERSION = 2.35;
   our $errstr = ();
   our @EXPORT_OK = ($VERSION, $errstr);
 
@@ -401,7 +401,7 @@ sub flatQuery {
 	        #ok, right here ... new for 2.34
 	        #we're going to detect ORA-ORA-03114 "not connected to oracle"
 	        #we'll try to re-connect and re-execute.
-	        if ( ($self->{'DBType'} eq "Oracle") && ($self->{'errstr'} =~/ORA-(\d{1,5})/i) ){
+	        if ( ($self->{'DBType'} eq "Oracle") && ($DBI::errstr =~/ORA-(\d{1,5})/i) ){
 	                my $ora_code = $1;
 	                
 	                #if we wanted to detect other ora failure codes, here's the spot for it.
